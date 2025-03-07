@@ -357,7 +357,7 @@ export default function Home() {
         {/* Stats Section */}
         <Section className="py-16 relative overflow-hidden">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-[#0a0014]/90" />
+          <div className="absolute inset-0 bg-[#0a0014]/90 top-[-100px] bottom-[-100px]" />
           <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent" />
           
           {/* Content */}
@@ -422,131 +422,131 @@ export default function Home() {
 
       <Suspense fallback={null}>
         {/* Featured Projects */}
-        <Section className="py-16">
-          <div className="absolute inset-0 top-[-100px] bottom-[-100px] opacity-30 backdrop-blur-lg">
-            <video autoPlay loop muted className="w-full h-full object-cover">
-              <source src="/purplish.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-16"
-          >
-            Featured <span className="text-accent-pink">Projects</span>
-          </motion.h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-            {featuredProjects.map((project, index) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-                className="glassmorphism rounded-xl overflow-hidden group relative flex flex-col h-full"
-              >
-                {/* Project Image */}
-                <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-primary/50 to-transparent z-[1]" />
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-4 sm:p-6 flex flex-col flex-grow relative z-[2]">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 text-center group-hover:text-accent-pink transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-white/70 mb-4 flex-grow">
-                    {project.description}
-                  </p>
-
-                  {/* Technologies */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tech.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-accent-purple/10 text-accent-pink border border-accent-pink/20"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 relative z-[5]">
-                    <div className="flex-1">
-                      <button
-                        onClick={() => window.open(project.preview, '_blank')}
-                        className="group w-full bg-gradient-to-r from-accent-pink via-accent-purple to-accent-pink bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-lg px-4 py-3 text-xs sm:text-sm transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg hover:shadow-accent-pink/25 flex items-center justify-center gap-2"
-                      >
-                        <span>Live Preview</span>
-                        <svg 
-                          className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" 
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="flex-1">
-                      <button
-                        onClick={() => window.open(project.code, '_blank')}
-                        className="group w-full border border-accent-pink text-accent-pink hover:bg-accent-pink/10 rounded-lg px-4 py-3 text-xs sm:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg hover:shadow-accent-pink/20 backdrop-blur-sm flex items-center justify-center gap-2 hover:border-opacity-80"
-                      >
-                        <span>View Code</span>
-                        <svg 
-                          className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" 
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Background Glow */}
-                <div
-                  className="absolute inset-0 opacity-20 rounded-xl transition-opacity duration-300 group-hover:opacity-30 z-[0]"
-                  style={{
-                    background: `radial-gradient(circle at center, ${project.color}55, transparent 70%)`,
-                  }}
-                />
-              </motion.div>
-            ))}
-          </div>
+        <Section className="py-16 relative overflow-hidden">
+          {/* Modern, performant background */}
+          <div className="absolute inset-0 bg-[#0a0014] top-[-100px] bottom-[-100px]" />
           
-          {/* More Projects Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex justify-center mt-8 sm:mt-12"
-          >
-            <Link href="/projects" className="group">
-              <MagneticButton variant="filled" className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-lg font-semibold">
-                <span className="flex items-center gap-2">
-                  More Projects
-                  <motion.span
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    className="group-hover:text-white"
-                  >
-                    →
-                  </motion.span>
-                </span>
-              </MagneticButton>
-            </Link>
-          </motion.div>
+          {/* Gradient mesh background */}
+          <div 
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(107,47,217,0.08),transparent_70%),radial-gradient(circle_at_100%_100%,rgba(255,46,147,0.08),transparent_50%)] top-[-100px] bottom-[-100px]"
+          />
+          
+          {/* Grid pattern overlay */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px'
+            }}
+          />
+
+          <div className="relative z-10 container mx-auto px-4 sm:px-6">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-accent-pink"
+            >
+              Featured <span className="text-accent-pink">Projects</span>
+            </motion.h2>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-center text-white/60 mb-8 sm:mb-12 max-w-2xl mx-auto"
+            >
+              Explore some of my recent work and innovative solutions
+            </motion.p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {featuredProjects.map((project, index) => (
+                <motion.div
+                  key={project.title}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="glassmorphism rounded-xl overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/10"
+                >
+                  <div className="relative h-52 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-primary/50 to-transparent z-10" />
+                    <motion.div
+                      initial={false}
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.4 }}
+                      style={{
+                        backgroundImage: `url(${project.image})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                      className="absolute inset-0"
+                    />
+                    <div className="absolute top-4 right-4 z-20 flex gap-2">
+                      <a
+                        href={project.preview}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-full bg-accent-pink/90 hover:bg-accent-pink text-white transform hover:scale-110 transition-all duration-300"
+                        title="Live Demo"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </a>
+                      <a
+                        href={project.code}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-full bg-white/90 hover:bg-white text-primary transform hover:scale-110 transition-all duration-300"
+                        title="Source Code"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-accent-pink transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-white/80 mb-4 text-sm leading-relaxed">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tech.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-3 py-1.5 text-xs font-medium rounded-full bg-accent-purple/20 text-accent-pink border border-accent-pink/20 shadow-sm transition-all duration-300 hover:shadow-accent-pink/20 hover:border-accent-pink/40"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* More Projects Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex justify-center mt-12"
+            >
+              <Link href="/projects">
+                <MagneticButton variant="filled" className="text-sm font-medium tracking-wide">
+                  View All Projects
+                </MagneticButton>
+              </Link>
+            </motion.div>
+          </div>
         </Section>
       </Suspense>
 
@@ -689,7 +689,7 @@ export default function Home() {
         {/* Testimonials Section */}
         <Section className="py-16 relative overflow-hidden">
           {/* Background Effects */}
-          <div className="absolute inset-0 top-[-100px] bg-gradient-to-r from-[#0a0014] to-[#1a0a2a] animate-pulse opacity-90 bottom-[-100px]" />
+          <div className="absolute inset-0 top-[-100px] bg-gradient-to-r from-[#0a0014] to-[#1a0a2a] animate-pulse opacity-90 bottom-[-100px] mb-4" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <motion.div

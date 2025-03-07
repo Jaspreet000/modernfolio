@@ -33,6 +33,9 @@ module.exports = {
         float: "float 6s ease-in-out infinite",
         "spin-slow": "spin 8s linear infinite",
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        gridLineX: "gridLineX 3s linear infinite",
+        gridLineY: "gridLineY 3s linear infinite",
+        gridPulse: "gridPulse 3s ease-in-out infinite"
       },
       keyframes: {
         glow: {
@@ -47,6 +50,18 @@ module.exports = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-20px)" },
         },
+        gridLineX: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" }
+        },
+        gridLineY: {
+          "0%": { backgroundPosition: "0 200%" },
+          "100%": { backgroundPosition: "0 -200%" }
+        },
+        gridPulse: {
+          "0%, 100%": { opacity: 0.1 },
+          "50%": { opacity: 0.2 }
+        }
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

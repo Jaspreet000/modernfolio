@@ -358,7 +358,7 @@ export default function Home() {
         <Section className="py-16 relative overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-[#0a0014]/90 top-[-100px] bottom-[-100px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent top-[-100px]" />
           
           {/* Content */}
           <div className="max-w-7xl mx-auto px-6 relative z-10">

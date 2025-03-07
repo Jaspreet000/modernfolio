@@ -2,50 +2,78 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Stars, Float } from "@react-three/drei";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Stars, Float, useGLTF, OrbitControls } from "@react-three/drei";
 import Section from "@/components/Section";
 import MagneticButton from "@/components/MagneticButton";
 import Scene3D from "@/components/Scene3D";
+import Link from "next/link";
+import Image from "next/image";
 
 // Spline Scene
 import Spline from "@splinetool/react-spline";
+import type { Application } from '@splinetool/runtime';
 import '../styles.css'; // Import the CSS file
+import useSplineAnimation from "@/hooks/useSplineAnimation";
 
 // Stats data
 const stats = [
-  { label: "Years Experience", value: "5+", icon: "clock" },
-  { label: "Projects Completed", value: "50+", icon: "check-circle" },
+  { label: "Years Experience", value: "1+", icon: "clock" },
+  { label: "Projects Completed", value: "15+", icon: "check-circle" },
   { label: "Technologies", value: "20+", icon: "cogs" },
-  { label: "Happy Clients", value: "30+", icon: "smile" },
+  { label: "Happy Clients", value: "5+", icon: "smile" },
 ];
 
 // Featured projects
 const featuredProjects = [
   {
-    title: "AI Dashboard",
-    description: "Real-time data visualization with AI insights",
-    tech: ["React", "TypeScript", "Three.js"],
+    title: "Promptalysis",
+    description: "Promptalysis – AI-powered platform using Google Gemini API to analyze and enhance prompt quality with feedback, discussions, and gamification. 🚀",
+    tech: ["Next.js", "TypeScript", "Gemini API","MongoDB","TailwindCSS"],
     color: "#6B2FD9",
+    image: "/project/project-10.png",
+    preview: "https://promptalysis-jet.vercel.app/",
+    code: "https://github.com/Jaspreet000/promptalysis"
   },
   {
-    title: "3D Configurator",
-    description: "Interactive product customization tool",
-    tech: ["WebGL", "Three.js", "GSAP"],
+    title: "Space Forecaster",
+    description: "Space Forecaster – AI-powered system for real-time space weather tracking, astronomical event predictions, and planetary condition analysis. 🚀",
+    tech: ["Next.js", "React Three Fibre", "TypeScript","TailwindCSS"],
     color: "#FF2E93",
+    image: "/project/project-12.png",
+    preview: "https://spaceforecaster.vercel.app",
+    code: "https://github.com/Jaspreet000/space_forecaster"
   },
   {
-    title: "Portfolio 3.0",
-    description: "Modern portfolio with 3D elements",
-    tech: ["Next.js", "Spline", "Framer"],
+    title: "Portfolio 2.0",
+    description: "Modern Portfolio – A modern, interactive portfolio built with React Three Fiber, featuring 3D effects, smooth animations, and a sleek, futuristic design. 🚀",
+    tech: ["Next.js", "Spline", "Framer","TailwindCSS","React Three Fibre"],
     color: "#00F0FF",
+    image: "/project/project-11.png",
+    preview: "https://www.jaspreeet.me/",
+    code: "https://github.com/Jaspreet000/modernfolio"
   },
 ];
 
 const testimonials = [
-  { name: "Client A", quote: "Jaspreet delivered exceptional work! Highly recommend.", image: "path/to/imageA.jpg" },
-  { name: "Client B", quote: "A true professional who understands the needs of the project.", image: "path/to/imageB.jpg" },
-  { name: "Client C", quote: "Great experience working together. Will hire again!", image: "path/to/imageC.jpg" },
+  { 
+    name: "Shahid", 
+    quote: "Jaspreet is a highly skilled frontend developer who makes complex tasks look effortless. Quiet yet impactful, he delivers with precision, a calm demeanor, and a willingness to help, ensuring every project runs smoothly. ", 
+    role: "AI Engineer, Proton Datalabs",
+    rating: 4 
+  },
+  { 
+    name: "Raghuveer Sain", 
+    quote: "A true professional who deeply understands project needs. His expertise, dedication, and attention to detail ensure outstanding results, consistently exceeding expectations with precision and quality.", 
+    role: "Instructor, IBM/Allsoft Sol",
+    rating: 5 
+  },
+  { 
+    name: "Ashish Singh", 
+    quote: "Jaspreet is a talented full-stack developer with a keen eye for detail. Focused and efficient, he tackles challenges with expertise, precision, and a problem-solving mindset, ensuring seamless project execution.", 
+    role: "Founder, NICS",
+    rating: 5 
+  },
 ];
 
 function MovingStars() {
@@ -60,13 +88,34 @@ function MovingStars() {
   return <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade ref={starsRef} />;
 }
 
+function Model() {
+  const { scene } = useGLTF('/models/universal.glb');
+  return (
+    <Float
+      speed={1.5}
+      rotationIntensity={0.6}
+      floatIntensity={0.6}
+      floatingRange={[-0.1, 0.1]}
+    >
+      <primitive 
+        object={scene} 
+        position={[-0.7, 0.7, 0]} 
+        scale={[1.4, 1.4, 1.2]} 
+        rotation={[(30 * Math.PI) / 180, (214 * Math.PI) / 180, (-5 * Math.PI) / 180]} 
+      />
+    </Float>
+  );
+}
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
+  const { onLoad } = useSplineAnimation();
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -76,6 +125,18 @@ export default function Home() {
     setTimeout(() => {
       setIsLoaded(true);
     }, 1000);
+
+    // Handle mobile detection
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize(); // Check on mount
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
@@ -83,7 +144,7 @@ export default function Home() {
       {/* Hero Section */}
       <motion.div
         style={{ y, opacity }}
-        className="relative min-h-screen flex flex-col items-center justify-center"
+        className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24 pb-12"
       >
         {/* 3D Background */}
         <div className="fixed inset-0 -z-10">
@@ -94,7 +155,27 @@ export default function Home() {
 
         {/* Spline Scene */}
         <div className="absolute inset-0 -z-5">
-          <Spline scene="https://prod.spline.design/vZ8hu14qlF4omSWv/scene.splinecode" />
+          {isLoaded && (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="relative w-full h-full transform-gpu">
+                <div className={`
+                  absolute inset-0 
+                  flex items-center justify-center
+                  ${isMobile ? '-mt-32' : ''}
+                  transition-all duration-500 ease-out
+                `}>
+                  <Spline 
+                    scene={
+                      isMobile 
+                        ? "https://prod.spline.design/4sjIlmoTTQRTAELL/scene.splinecode"
+                        : "https://prod.spline.design/vZ8hu14qlF4omSWv/scene.splinecode"
+                    }
+                    onLoad={onLoad}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Hero Content */}
@@ -105,15 +186,17 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple via-accent-pink to-accent-cyan">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple via-accent-pink to-accent-cyan">
               Hi there! I&apos;m
             </h1>
-            <div className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 smoke-effect">
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 smoke-effect">
               Jaspreet Singh
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white">Full Stack Developer</h2>
-            <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Passionate about building scalable web applications and creating seamless user experiences.
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-white">
+              Full Stack Developer
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
+            with expertise in building scalable web applications, AI-powered platforms, and secure authentication systems using Next.js, React.js, and cloud technologies.
             </p>
           </motion.div>
 
@@ -123,185 +206,455 @@ export default function Home() {
             transition={{ delay: 0.5 }}
             className="flex flex-col md:flex-row gap-6 justify-center items-center"
           >
-            <MagneticButton variant="filled">View Projects</MagneticButton>
-            <MagneticButton variant="outlined">Contact Me</MagneticButton>
+            <Link href="/projects">
+              <MagneticButton variant="filled" className="w-full md:w-auto">View Projects</MagneticButton>
+            </Link>
+            <Link href="/contact">
+              <MagneticButton variant="outlined" className="w-full md:w-auto">Contact Me</MagneticButton>
+            </Link>
           </motion.div>
         </div>
 
         {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full p-1">
-            <motion.div
-              animate={{
-                y: [0, 12, 0],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                repeatType: "loop",
-              }}
-              className="w-2 h-2 bg-white rounded-full"
-            />
-          </div>
-        </motion.div>
+        {!isMobile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          >
+            <div className="w-6 h-10 border-2 border-white/30 rounded-full p-1">
+              <motion.div
+                animate={{
+                  y: [0, 12, 0],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  repeatType: "loop",
+                }}
+                className="w-2 h-2 bg-white rounded-full"
+              />
+            </div>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Stats Section */}
-      <Section className="py-24 bg-primary/95 relative overflow-hidden min-h-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-accent-purple/10 to-accent-pink/10 opacity-30 rounded-lg" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-7xl mx-auto relative z-10">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="text-center"
-            >
-              <motion.h3
-                whileHover={{ scale: 1.1, textShadow: "0 0 10px rgba(255, 255, 255, 0.8)" }}
-                className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent-purple to-accent-pink bg-clip-text text-transparent mb-2"
+      <Section className="py-16 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[#0a0014]/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent" />
+        
+        {/* Content */}
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Section Title */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-center mb-12 md:mb-16"
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
+              Experience & <span className="text-accent-pink">Impact</span>
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-white/60 max-w-2xl mx-auto">
+              Delivering exceptional results through years of dedicated development and innovation
+            </p>
+          </motion.div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative group"
               >
-                <span className="flex items-center justify-center mb-2">
-                  <i className={`fas fa-${stat.icon} mr-2`}></i>
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1 }}
-                    className="text-4xl"
-                  >
+                {/* Card Background with Glassmorphism */}
+                <div className="absolute inset-0 bg-white/[0.02] group-hover:bg-white/[0.04] backdrop-blur-sm rounded-2xl border border-white/[0.05] transition-all duration-300" />
+                
+                {/* Gradient Accent */}
+                <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-accent-purple/40 to-transparent" />
+                <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-accent-pink/40 to-transparent" />
+                
+                {/* Content Container */}
+                <div className="relative p-4 sm:p-6 md:p-8">
+                  {/* Icon */}
+                  <div className="mb-3 md:mb-4 text-accent-purple/80">
+                    <i className={`fas fa-${stat.icon} text-xl sm:text-2xl md:text-3xl`} />
+                  </div>
+                  
+                  {/* Value */}
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent-purple to-accent-pink bg-clip-text text-transparent">
                     {stat.value}
-                  </motion.span>
-                </span>
-              </motion.h3>
-              <p className="text-white/60">{stat.label}</p>
-            </motion.div>
-          ))}
+                  </span>
+                  
+                  {/* Label */}
+                  <p className="text-sm sm:text-base md:text-lg text-white/60 font-medium">
+                    {stat.label}
+                  </p>
+
+                  {/* Hover Effect Indicator */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-purple to-accent-pink transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-xl" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </Section>
 
       {/* Featured Projects */}
-      <Section className="py-24">
+      <Section className="py-16">
+        <div className="absolute inset-0 top-[-100px] bottom-[-100px] opacity-30 backdrop-blur-lg">
+          <video autoPlay loop muted className="w-full h-full object-cover">
+            <source src="/purplish.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-4xl font-bold text-center mb-16"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-16"
         >
           Featured <span className="text-accent-pink">Projects</span>
         </motion.h2>
-        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           {featuredProjects.map((project, index) => (
             <motion.div
               key={project.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
-              whileHover={{ y: -10 }}
-              className="glassmorphism p-6 rounded-xl relative group cursor-pointer"
+              className="glassmorphism rounded-xl overflow-hidden group relative flex flex-col h-full"
             >
+              {/* Project Image */}
+              <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-primary/50 to-transparent z-[1]" />
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="p-4 sm:p-6 flex flex-col flex-grow relative z-[2]">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 text-center group-hover:text-accent-pink transition-colors">
+                  {project.title}
+                </h3>
+                <p className="text-sm sm:text-base text-white/70 mb-4 flex-grow">
+                  {project.description}
+                </p>
+
+                {/* Technologies */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.tech.map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-accent-purple/10 text-accent-pink border border-accent-pink/20"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 relative z-[5]">
+                  <div className="flex-1">
+                    <button
+                      onClick={() => window.open(project.preview, '_blank')}
+                      className="group w-full bg-gradient-to-r from-accent-pink via-accent-purple to-accent-pink bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-lg px-4 py-3 text-xs sm:text-sm transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg hover:shadow-accent-pink/25 flex items-center justify-center gap-2"
+                    >
+                      <span>Live Preview</span>
+                      <svg 
+                        className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <button
+                      onClick={() => window.open(project.code, '_blank')}
+                      className="group w-full border border-accent-pink text-accent-pink hover:bg-accent-pink/10 rounded-lg px-4 py-3 text-xs sm:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg hover:shadow-accent-pink/20 backdrop-blur-sm flex items-center justify-center gap-2 hover:border-opacity-80"
+                    >
+                      <span>View Code</span>
+                      <svg 
+                        className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Background Glow */}
               <div
-                className="absolute inset-0 opacity-20 rounded-xl transition-opacity duration-300 group-hover:opacity-30"
+                className="absolute inset-0 opacity-20 rounded-xl transition-opacity duration-300 group-hover:opacity-30 z-[0]"
                 style={{
                   background: `radial-gradient(circle at center, ${project.color}55, transparent 70%)`,
                 }}
               />
-              <h3 className="text-2xl font-bold mb-3">{project.title}</h3>
-              <p className="text-white/70 mb-4">{project.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {project.tech.map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-3 py-1 text-sm rounded-full bg-accent-purple/10 text-accent-pink"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
             </motion.div>
           ))}
         </div>
+        
+        {/* More Projects Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex justify-center mt-8 sm:mt-12"
+        >
+          <Link href="/projects" className="group">
+            <MagneticButton variant="filled" className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-lg font-semibold">
+              <span className="flex items-center gap-2">
+                More Projects
+                <motion.span
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="group-hover:text-white"
+                >
+                  →
+                </motion.span>
+              </span>
+            </MagneticButton>
+          </Link>
+        </motion.div>
       </Section>
 
       {/* Interactive 3D Section */}
-      <Section className="py-24 bg-primary/95">
+      <Section className="py-16 bg-primary/95">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
             >
-              <h2 className="text-4xl font-bold mb-6">
-                Interactive <span className="text-accent-cyan">Experience</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                Experience the <span className="text-accent-pink">Futuristic Police Car Crash</span>
               </h2>
-              <p className="text-white/70 mb-8">
-                Explore my work through interactive 3D elements and immersive
-                animations. Each project is crafted with attention to detail and
-                modern technologies.
+              <p className="text-sm sm:text-base md:text-lg text-white/70 mb-6 md:mb-8">
+                Dive into an interactive experience with the futuristic police car model. Rotate, zoom, and explore its dynamic design as it crashes in real-time!
               </p>
-              <MagneticButton variant="filled">Explore More</MagneticButton>
+              <p className="text-sm sm:text-base md:text-lg text-white/70">
+                Feel free to interact with the model by rotating and zooming in using your mouse or touch gestures.
+              </p>
             </motion.div>
             <div className="h-[400px]">
-              <Scene3D
-                scale={2}
-                position={[0, -1, 0]}
-                rotation={[0, Math.PI / 4, 0]}
-              />
+              <Canvas>
+                <ambientLight intensity={0.5} />
+                <directionalLight position={[10, 10, 5]} intensity={1} />
+                <Model />
+                <OrbitControls />
+              </Canvas>
             </div>
           </div>
         </div>
       </Section>
 
       {/* Contact CTA */}
-      <Section className="py-24">
-        <div className="max-w-4xl mx-auto text-center px-6">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-bold mb-8"
-          >
-            Let's Create Something
-            <span className="block text-accent-pink">Amazing Together</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-white/70 mb-12 text-lg"
-          >
-            Have a project in mind? Let's discuss how we can bring your ideas to
-            life with cutting-edge web technologies.
-          </motion.p>
-          <MagneticButton variant="filled">Get In Touch</MagneticButton>
+      <Section className="py-16 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0">
+          <Canvas>
+            <MovingStars />
+            <Float
+              speed={2}
+              rotationIntensity={2}
+              floatIntensity={1}
+              floatingRange={[-0.1, 0.1]}
+            >
+              <mesh>
+                <torusGeometry args={[8, 0.5, 16, 100]} />
+                <meshStandardMaterial color="#6B2FD9" opacity={0.1} transparent />
+              </mesh>
+            </Float>
+          </Canvas>
+        </div>
+
+        {/* Content Container */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="relative glassmorphism border border-white/10 p-6 sm:p-8 md:p-12 lg:p-16 rounded-3xl overflow-hidden">
+            {/* Animated gradient orbs */}
+            <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-accent-purple/20 blur-3xl animate-pulse" />
+            <div className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full bg-accent-pink/20 blur-3xl animate-pulse delay-300" />
+            
+            {/* Content */}
+            <div className="relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                className="space-y-6 sm:space-y-8 md:space-y-10 text-center"
+              >
+                {/* Decorative line */}
+                <div className="flex justify-center">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: "60px sm:width-[80px] md:width-[100px]" }}
+                    transition={{ duration: 1 }}
+                    className="h-0.5 sm:h-1 bg-gradient-to-r from-accent-purple to-accent-pink rounded-full"
+                  />
+                </div>
+
+                {/* Heading */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  className="space-y-3 sm:space-y-4"
+                >
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight">
+                    Let's Build Your
+                    <span className="block mt-1 sm:mt-2">
+                      <span className="text-accent-cyan">Digital </span>
+                      <span className="text-accent-pink">Future</span>
+                    </span>
+                  </h2>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
+                    Transform your vision into reality with cutting-edge technology 
+                    and innovative design solutions.
+                  </p>
+                </motion.div>
+
+                {/* CTA Button */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="pt-4 sm:pt-6"
+                >
+                  <Link href="/contact" className="w-full sm:w-auto">
+                    <MagneticButton variant="filled" className="group relative w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg">
+                      <motion.span
+                        className="absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-pink rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                        initial={false}
+                      />
+                      <span className="flex items-center justify-center gap-2 sm:gap-3">
+                        <span>Start Your Project</span>
+                        <motion.span
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="text-lg sm:text-xl"
+                        >
+                          →
+                        </motion.span>
+                      </span>
+                    </MagneticButton>
+                  </Link>
+                </motion.div>
+
+                {/* Tech stack icons or additional decorative elements can be added here */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex justify-center gap-8 pt-8"
+                >
+                  {['react', 'next', 'three'].map((tech, index) => (
+                    <motion.div
+                      key={tech}
+                      initial={{ y: 20, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="text-white/30 hover:text-white/60 transition-colors duration-300 text-3xl"
+                    >
+                      <i className={`fab fa-${tech} text-3xl`}></i>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
         </div>
       </Section>
 
       {/* Testimonials Section */}
-      <Section className="py-24 bg-secondary relative overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h2
+      <Section className="py-16 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 top-[-100px] bg-gradient-to-r from-[#0a0014] to-[#1a0a2a] animate-pulse opacity-90 bottom-[-100px]" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold mb-12"
+            className="text-center mb-12 md:mb-16"
           >
-            What My Clients Say
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
+              Client <span className="text-accent-pink">Testimonials</span>
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-white/60 max-w-2xl mx-auto">
+              Don't just take my word for it - hear what my clients have to say about their experiences working with me.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
-                key={index}
+                key={testimonial.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white p-6 rounded-lg shadow-lg"
+                transition={{ delay: index * 0.2 }}
+                className="relative group"
               >
-                <img src={testimonial.image} alt={testimonial.name} className="w-16 h-16 rounded-full mx-auto mb-4" />
-                <p className="text-lg italic">"{testimonial.quote}"</p>
-                <p className="mt-4 font-semibold">- {testimonial.name}</p>
+                <div className="relative glassmorphism rounded-2xl p-6 sm:p-8 h-full transition-all duration-300 border border-white/5 group-hover:border-accent-pink/20">
+                  {/* Quote Icon */}
+                  <div className="absolute top-4 right-4 text-4xl text-accent-pink/20 font-serif">
+                    "
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex flex-col h-full">
+                    {/* Quote */}
+                    <div className="mb-6 flex-grow">
+                      <p className="text-sm sm:text-base text-white/80 leading-relaxed italic">
+                        "{testimonial.quote}"
+                      </p>
+                    </div>
+                    
+                    {/* Divider */}
+                    <div className="w-16 h-px bg-gradient-to-r from-accent-purple to-accent-pink mb-6" />
+                    
+                    {/* Author Info */}
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        <h4 className="text-base sm:text-lg font-semibold text-white group-hover:text-accent-pink transition-colors">
+                          {testimonial.name}
+                        </h4>
+                        <p className="text-sm text-white/60">
+                          {testimonial.role}
+                        </p>
+                        {/* Rating Stars */}
+                        <div className="flex gap-1 mt-2">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <motion.span
+                              key={i}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: i * 0.1 }}
+                              className="text-accent-pink text-sm"
+                            >
+                              ★
+                            </motion.span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hover Effects */}
+                  <div className="absolute inset-0 rounded-2xl transition-all duration-300 group-hover:bg-gradient-to-b from-accent-purple/5 to-transparent -z-10" />
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-accent-purple/5 via-accent-pink/5 to-accent-cyan/5 -z-10" />
+                </div>
               </motion.div>
             ))}
           </div>

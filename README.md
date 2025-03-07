@@ -1,149 +1,163 @@
-# Blockly - Block-Based Programming Environment
+# 🚀 Modernfolio - Next.js Portfolio
 
-A modern, responsive web application that provides a visual programming environment using Blockly. This tool allows users to create programs by dragging and dropping blocks, making programming more accessible and intuitive.
+<div align="center">
+  
+  ![Modernfolio Banner](public/project/project-11.png)
 
-## 🚀 Features
+  <h3>A Modern Portfolio Built with Next.js 14, Three.js, and Spline</h3>
 
-### Visual Programming Interface
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+  [![Three.js](https://img.shields.io/badge/Three.js-Latest-black?style=for-the-badge&logo=three.js)](https://threejs.org/)
+  [![Framer Motion](https://img.shields.io/badge/Framer_Motion-Latest-ff69b4?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
 
-- **Interactive Block Editor**: Drag-and-drop interface for building programs
-- **Multiple Block Categories**:
-  - Variables: Create and manage variables
-  - Math: Perform mathematical operations
-  - Output: Display results and messages
-  - Logic: Implement conditional logic and boolean operations
+  <a href="https://www.jaspreeet.me">🌐 Live Demo</a> • 
+  <a href="#features">✨ Features</a> • 
+  <a href="#tech-stack">🛠️ Tech Stack</a> • 
+  <a href="#getting-started">🏁 Getting Started</a>
 
-### Modern UI/UX
+</div>
 
-- **Responsive Design**: Fully responsive layout that works on mobile, tablet, and desktop
-- **Dual View System**:
-  - Workspace view for block programming
-  - Console view for output and execution results
-- **Real-time Feedback**: Visual indicators for execution status and errors
+## ✨ Features
 
-### Development Features
+<div align="center">
+  <table>
+    <tr>
+      <td>
+        <strong>🎨 Modern Design</strong><br/>
+        Sleek, minimalist interface with glassmorphism effects
+      </td>
+      <td>
+        <strong>🌟 3D Elements</strong><br/>
+        Interactive 3D models using Three.js and Spline
+      </td>
+      <td>
+        <strong>📱 Responsive</strong><br/>
+        Fully responsive design for all devices
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>⚡ Performance</strong><br/>
+        Optimized for speed and SEO
+      </td>
+      <td>
+        <strong>🎭 Animations</strong><br/>
+        Smooth transitions and micro-interactions
+      </td>
+      <td>
+        <strong>🎯 Interactive</strong><br/>
+        Engaging user experience with dynamic elements
+      </td>
+    </tr>
+  </table>
+</div>
 
-- **Live Code Generation**: Automatic JavaScript code generation from blocks
-- **Error Handling**: Comprehensive error detection and reporting
-- **Block Validation**: Automatic validation of block connections and configurations
+## 🛠️ Tech Stack
 
-### Technical Highlights
+- **Framework:** Next.js 14
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **3D Graphics:** Three.js, React Three Fiber, Spline
+- **Animations:** Framer Motion
+- **Deployment:** Vercel
+- **Performance:** 90+ Lighthouse score
 
-- **Modern Stack**: Built with React and Blockly
-- **Real-time Updates**: Instant feedback for code execution
-- **Custom Block Definitions**: Extensible block system
-- **Responsive Controls**: Adaptive UI elements for different screen sizes
+## 🏁 Getting Started
 
-## 🛠️ Setup and Installation
-
-### Prerequisites
-
-- Node.js (v14.0.0 or higher)
-- npm (v6.0.0 or higher)
-
-### Installation Steps
-
-1. Clone the repository:
-
+1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd blocklycode
+   git clone https://github.com/Jaspreet000/modernfolio.git
+   cd modernfolio
    ```
 
-2. Install dependencies:
-
+2. **Install dependencies**
    ```bash
    npm install
+   # or
+   yarn install
    ```
 
-3. Start the development server:
-
+3. **Run the development server**
    ```bash
-   npm start
+   npm run dev
+   # or
+   yarn dev
    ```
 
-4. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+4. **Open [http://localhost:3000](http://localhost:3000)**
 
-### Project Structure
+## 📁 Project Structure
 
 ```
-blocklycode/
+modernfolio/
 ├── src/
-│   ├── components/
-│   │   ├── BlocklyEditor.js    # Main editor component
-│   │   └── BlocklyConfig.js    # Block configurations
-│   ├── App.js
-│   └── index.js
-├── public/
-└── package.json
+│   ├── app/           # Next.js app directory
+│   ├── components/    # Reusable components
+│   ├── hooks/         # Custom React hooks
+│   ├── styles/        # Global styles
+│   └── types/         # TypeScript types
+├── public/           # Static assets
+└── package.json     # Project dependencies
 ```
 
-## 🎯 Usage Guide
+## 🎯 Key Features
 
-1. **Getting Started**
+### 💫 Interactive 3D Elements
+- Custom 3D models and animations
+- Responsive 3D scenes
+- Performance-optimized rendering
 
-   - Launch the application
-   - Select a category from the sidebar
-   - Drag blocks into the workspace
+### 🎨 Modern UI/UX
+- Glassmorphism effects
+- Smooth scroll animations
+- Dynamic color schemes
+- Micro-interactions
 
-2. **Creating Programs**
+### 📱 Responsive Design
+- Mobile-first approach
+- Adaptive layouts
+- Touch-friendly interactions
+- Optimized assets
 
-   - Combine blocks to create your program
-   - Use the connection points to link blocks
-   - Add variables, math operations, and logic as needed
+## 🚀 Performance
 
-3. **Running Code**
+- **Lighthouse Scores**
+  - Performance: 90+
+  - Accessibility: 95+
+  - Best Practices: 95+
+  - SEO: 100
 
-   - Click the "Run Code" button to execute
-   - View results in the console panel
-   - Check execution status and any error messages
+## 📈 Future Improvements
 
-4. **Managing Workspace**
-   - Use the trash icon to reset workspace
-   - Switch between workspace and console views
-   - Zoom and pan controls for better navigation
-
-## 💻 Responsive Design
-
-The application is optimized for different screen sizes:
-
-- **Mobile** (320px+): Compact layout with essential controls
-- **Tablet** (768px+): Enhanced workspace area and controls
-- **Desktop** (1024px+): Full featured interface with maximized workspace
-
-## 🔧 Technical Details
-
-### Built With
-
-- React.js - Frontend framework
-- Blockly - Block programming library
-- Tailwind CSS - Styling and responsive design
-- HeroIcons - UI icons
-
-### Key Features Implementation
-
-- Custom block definitions in BlocklyConfig.js
-- Real-time JavaScript code generation
-- Responsive UI components with Tailwind CSS
-- Error handling and validation system
+- [ ] Add blog section
+- [ ] Implement dark/light theme
+- [ ] Add more interactive 3D elements
+- [ ] Improve accessibility
+- [ ] Add more animations
+- [ ] Implement i18n support
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 👨‍💻 Author
 
-- Google Blockly team for the amazing block programming library
-- React team for the frontend framework
-- Tailwind CSS team for the utility-first CSS framework
+**Jaspreet Singh**
+- Portfolio: [jaspreeet.me](https://www.jaspreeet.me)
+- GitHub: [@Jaspreet000](https://github.com/Jaspreet000)
+
+---
+
+<div align="center">
+  <p>If you found this project interesting, please consider giving it a ⭐!</p>
+  
+  [![GitHub stars](https://img.shields.io/github/stars/Jaspreet000/modernfolio?style=social)](https://github.com/Jaspreet000/modernfolio/stargazers)
+  
+  Made with ❤️ by Jaspreet Singh
+</div>

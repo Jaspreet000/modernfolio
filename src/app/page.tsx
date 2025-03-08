@@ -109,34 +109,38 @@ function MovingStars() {
 
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
-    // Update star positions based on time to create a moving effect
-    starsRef.current.rotation.y = time * 0.1; // Adjust speed as needed
+    starsRef.current.rotation.y = time * 0.05; // Reduced speed
   });
 
-  return <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade ref={starsRef} />;
+  return (
+    <Stars 
+      radius={80} 
+      depth={40} 
+      count={2500} // Reduced count
+      factor={3} 
+      saturation={0} 
+      fade 
+      ref={starsRef} 
+    />
+  );
 }
 
 function HeroModel() {
   const { scene } = useGLTF('/models/abstract.glb');
   
   useEffect(() => {
-    // Update materials with enhanced metallic brinjal color scheme
     scene.traverse((child: any) => {
       if (child.isMesh) {
-        child.material.metalness = 1.0;
-        child.material.roughness = 0.1;
-        // Maintain dark pink base color
+        // Simplified materials for better performance
+        child.material.metalness = 0.8;
+        child.material.roughness = 0.2;
         child.material.color.setHex(0x4A1F3D);
-        // Enhanced metallic glow
         child.material.emissive.setHex(0x5A2F4D);
-        child.material.emissiveIntensity = 0.8;
-        // Reduce ambient occlusion for more shine
-        child.material.aoMapIntensity = 0.3;
-        // Increase environment map intensity for stronger reflections
-        child.material.envMapIntensity = 2.0;
-        // Enhanced clearcoat for mirror-like finish
-        child.material.clearcoat = 0.8;
-        child.material.clearcoatRoughness = 0.1;
+        child.material.emissiveIntensity = 0.5;
+        // Remove expensive effects
+        child.material.envMapIntensity = 1.0;
+        child.material.clearcoat = 0;
+        child.material.clearcoatRoughness = 0;
       }
     });
   }, [scene]);
@@ -198,82 +202,38 @@ export default function Home() {
         style={{ y, opacity }}
         className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24 pb-12"
       >
-        {/* 3D Background - Only load on desktop */}
+        {/* Stars Background - Only load on desktop */}
         {!isMobile && (
-          <div className="fixed inset-0 -z-10">
+          <div className="fixed inset-0 -z-20 bg-[#0a0014]">
             <Suspense fallback={null}>
-              <ThreeBackground />
+              <Canvas camera={{ position: [0, 0, 1] }}>
+                <MovingStars />
+              </Canvas>
             </Suspense>
           </div>
         )}
 
-        {/* 3D Model */}
-        {isLoaded && (
-          <div className="absolute inset-0 -z-5">
+        {/* 3D Model with separate Canvas */}
+        {isLoaded && !isMobile && (
+          <div className="absolute inset-0 -z-10">
             <div className="w-full h-full flex items-center justify-center">
               <div className="relative w-full h-full transform-gpu">
-                <div className={`
-                  absolute inset-0 
-                  flex items-center justify-center
-                  ${isMobile ? '-mt-32' : '-mt-16'}
-                  transition-all duration-500 ease-out
-                `}>
+                <div className="absolute inset-0 flex items-center justify-center -mt-16">
                   <Suspense fallback={<div className="w-full h-full bg-primary/50 animate-pulse" />}>
                     <Canvas
                       camera={{ position: [0, 0, 15], fov: 25 }}
                       style={{ background: 'transparent' }}
+                      dpr={[1, 2]} // Limit DPR for better performance
+                      performance={{ min: 0.5 }} // Allow frame rate to drop for better performance
                     >
-                      {/* Enhanced lighting for more metallic effect */}
-                      <ambientLight intensity={0.7} color="#4A1F3D" />
-                      
-                      {/* Main directional lights with increased intensity */}
+                      {/* Simplified lighting setup */}
+                      <ambientLight intensity={0.5} color="#4A1F3D" />
                       <directionalLight 
                         position={[5, 5, 5]} 
-                        intensity={1.6}
+                        intensity={1.2}
                         color="#5A2F4D"
                       />
-                      <directionalLight 
-                        position={[-5, -5, -5]} 
-                        intensity={1.1}
-                        color="#4A1F3D"
-                      />
-                      
-                      {/* Accent lights for enhanced metallic reflections */}
-                      <pointLight 
-                        position={[3, 3, 3]} 
-                        color="#6A3F5D" 
-                        intensity={1.0} 
-                        distance={25}
-                        decay={1.1}
-                      />
-                      <pointLight 
-                        position={[-3, -3, 3]} 
-                        color="#4A1F3D" 
-                        intensity={1.0}
-                        distance={25}
-                        decay={1.1}
-                      />
-                      
-                      {/* Enhanced top highlight for metallic shine */}
-                      <spotLight
-                        position={[0, 8, 0]}
-                        angle={0.4}
-                        penumbra={0.5}
-                        intensity={1.6}
-                        color="#5A2F4D"
-                        distance={35}
-                        decay={1.1}
-                      />
-                      
-                      {/* Environment lighting for enhanced reflections */}
-                      <hemisphereLight
-                        intensity={0.6}
-                        color="#6A3F5D"
-                        groundColor="#2E1F2D"
-                      />
-                      
                       <HeroModel />
-                      
                       <OrbitControls
                         enableZoom={false}
                         enablePan={false}

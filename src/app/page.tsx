@@ -527,18 +527,18 @@ export default function Home() {
         {/* Contact CTA */}
         <Section className="py-16 relative overflow-hidden">
           {/* Animated background */}
-          <div className="absolute inset-0">
+          {/* <div className="absolute inset-0">
             <Suspense fallback={null}>
               <ThreeBackground />
             </Suspense>
-          </div>
+          </div> */}
 
           {/* Content Container */}
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="relative glassmorphism border border-white/10 p-6 sm:p-8 md:p-12 lg:p-16 rounded-3xl overflow-hidden">
               {/* Animated gradient orbs */}
-              <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-accent-purple/20 blur-3xl animate-pulse" />
-              <div className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full bg-accent-pink/20 blur-3xl animate-pulse delay-300" />
+              {/* <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-accent-purple/20 blur-3xl animate-pulse" />
+              <div className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full bg-accent-pink/20 blur-3xl animate-pulse delay-300" /> */}
               
               {/* Content */}
               <div className="relative z-10">

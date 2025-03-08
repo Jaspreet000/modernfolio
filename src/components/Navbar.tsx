@@ -135,25 +135,30 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-white focus:outline-none"
+          className="md:hidden relative w-8 h-8 flex items-center justify-center focus:outline-none"
+          aria-label="Toggle menu"
         >
-          <div className="w-6 h-6 flex flex-col justify-between">
-            <span
-              className={`w-full h-0.5 bg-white transform transition-transform duration-300 ${
-                isOpen ? "rotate-45 translate-y-2.5" : ""
-              }`}
-            />
-            <span
-              className={`w-full h-0.5 bg-white transition-opacity duration-300 ${
-                isOpen ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`w-full h-0.5 bg-white transform transition-transform duration-300 ${
-                isOpen ? "-rotate-45 -translate-y-2.5" : ""
-              }`}
-            />
+          <div className="w-5 h-5 flex items-center justify-center">
+            <div className="relative w-full h-full">
+              <span
+                className={`absolute top-0 left-0 w-full h-[2px] bg-white transform transition-all duration-200 ease-in-out origin-center
+                  ${isOpen ? "translate-y-[9px] rotate-45" : ""}`}
+              />
+              <span
+                className={`absolute top-[9px] left-0 w-full h-[2px] bg-white transform transition-all duration-200 ease-in-out
+                  ${isOpen ? "opacity-0 translate-x-2" : ""}`}
+              />
+              <span
+                className={`absolute bottom-0 left-0 w-full h-[2px] bg-white transform transition-all duration-200 ease-in-out origin-center
+                  ${isOpen ? "-translate-y-[9px] -rotate-45" : ""}`}
+              />
+            </div>
           </div>
+          <div 
+            className={`absolute inset-0 rounded-lg transition-colors duration-300 ${
+              isOpen ? "bg-white/10" : "hover:bg-white/5"
+            }`}
+          />
         </button>
       </div>
 
@@ -161,13 +166,13 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-            className="absolute top-full left-0 right-0 backdrop-blur-md bg-black/70 md:hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-0 right-0 backdrop-blur-lg bg-black/90 border-t border-white/10 md:hidden shadow-xl"
           >
-            <div className="px-6 py-4 space-y-4">
+            <div className="px-6 py-4 space-y-3">
               {navItems.map((item) => (
                 item.isDownload ? (
                   <button
@@ -176,10 +181,10 @@ export default function Navbar() {
                       handleDownload();
                       setIsOpen(false);
                     }}
-                    className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-accent-purple to-accent-pink text-white font-semibold flex items-center justify-between"
+                    className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-accent-purple to-accent-pink text-white font-semibold flex items-center justify-between group hover:shadow-lg hover:shadow-accent-pink/20 transition-all duration-300"
                   >
-                    {item.name}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span>{item.name}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover:translate-y-0.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </button>
@@ -188,10 +193,10 @@ export default function Navbar() {
                     key={item.path}
                     href={item.path}
                     onClick={() => setIsOpen(false)}
-                    className={`block py-2 px-4 rounded-lg transition-all duration-300 ${
+                    className={`block py-2.5 px-4 rounded-lg transition-all duration-300 ${
                       pathname === item.path
-                        ? "bg-gradient-to-r from-accent-purple to-accent-pink text-white"
-                        : "hover:bg-white/10"
+                        ? "bg-gradient-to-r from-accent-purple to-accent-pink text-white font-medium"
+                        : "text-white/90 hover:bg-white/10"
                     }`}
                   >
                     {item.name}

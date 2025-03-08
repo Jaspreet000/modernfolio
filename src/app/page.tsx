@@ -7,7 +7,7 @@ import { Stars, Float, useGLTF, OrbitControls } from "@react-three/drei";
 import Section from "@/components/Section";
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import dynamic from "next/dynamic";
 import type { Application } from '@splinetool/runtime';
 
@@ -358,7 +358,7 @@ export default function Home() {
         <Section className="py-16 relative overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-[#0a0014]/90 top-[-100px] bottom-[-100px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent top-[-100px]" />
           
           {/* Content */}
           <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -423,74 +423,40 @@ export default function Home() {
       <Suspense fallback={null}>
         {/* Featured Projects */}
         <Section className="py-16 relative overflow-hidden">
-          {/* Modern, performant background */}
-          <div className="absolute inset-0 bg-[#0a0014] top-[-100px] bottom-[-100px]" />
+          {/* Simple gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0014] to-[#0F0F1A] top-[-100px] bottom-[-100px]" />
           
-          {/* Gradient mesh background */}
-          <div 
-            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(107,47,217,0.08),transparent_70%),radial-gradient(circle_at_100%_100%,rgba(255,46,147,0.08),transparent_50%)] top-[-100px] bottom-[-100px]"
-          />
-          
-          {/* Grid pattern overlay */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
-              `,
-              backgroundSize: '40px 40px'
-            }}
-          />
-
           <div className="relative z-10 container mx-auto px-4 sm:px-6">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-accent-pink"
-            >
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-accent-pink">
               Featured <span className="text-accent-pink">Projects</span>
-            </motion.h2>
+            </h2>
             
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-center text-white/60 mb-8 sm:mb-12 max-w-2xl mx-auto"
-            >
+            <p className="text-center text-white/60 mb-8 sm:mb-12 max-w-2xl mx-auto">
               Explore some of my recent work and innovative solutions
-            </motion.p>
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {featuredProjects.map((project, index) => (
-                <motion.div
+              {featuredProjects.map((project) => (
+                <div
                   key={project.title}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  whileHover={{ y: -10, scale: 1.02 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="glassmorphism rounded-xl overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/10"
+                  className="group bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-accent-pink/20 transition-colors duration-300"
                 >
                   <div className="relative h-52 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-primary/50 to-transparent z-10" />
-                    <motion.div
-                      initial={false}
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.4 }}
+                    <div
                       style={{
                         backgroundImage: `url(${project.image})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                       }}
-                      className="absolute inset-0"
+                      className="absolute inset-0 transform transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <div className="absolute top-4 right-4 z-20 flex gap-2">
                       <a
                         href={project.preview}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-accent-pink/90 hover:bg-accent-pink text-white transform hover:scale-110 transition-all duration-300"
+                        className="p-2 rounded-full bg-accent-pink/90 hover:bg-accent-pink text-white transition-colors duration-300"
                         title="Live Demo"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -502,7 +468,7 @@ export default function Home() {
                         href={project.code}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-white/90 hover:bg-white text-primary transform hover:scale-110 transition-all duration-300"
+                        className="p-2 rounded-full bg-white/90 hover:bg-white text-primary transition-colors duration-300"
                         title="Source Code"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -512,40 +478,34 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-accent-pink transition-colors">
+                    <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-accent-pink transition-colors duration-300">
                       {project.title}
                     </h3>
-                    <p className="text-white/80 mb-4 text-sm leading-relaxed">
+                    <p className="text-white/80 mb-4 text-sm leading-relaxed line-clamp-3">
                       {project.description}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {project.tech.map((tech) => (
+                      {project.tech.slice(0, 3).map((tech) => (
                         <span
                           key={tech}
-                          className="px-3 py-1.5 text-xs font-medium rounded-full bg-accent-purple/20 text-accent-pink border border-accent-pink/20 shadow-sm transition-all duration-300 hover:shadow-accent-pink/20 hover:border-accent-pink/40"
+                          className="px-3 py-1.5 text-xs font-medium rounded-full bg-accent-purple/10 text-accent-pink border border-accent-pink/10"
                         >
                           {tech}
                         </span>
                       ))}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
-            {/* More Projects Button */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex justify-center mt-12"
-            >
+            <div className="flex justify-center mt-12">
               <Link href="/projects">
                 <MagneticButton variant="filled" className="text-sm font-medium tracking-wide">
                   View All Projects
                 </MagneticButton>
               </Link>
-            </motion.div>
+            </div>
           </div>
         </Section>
       </Suspense>

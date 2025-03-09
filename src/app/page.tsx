@@ -291,9 +291,9 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* 3D Model - Background on mobile, Right side on desktop */}
-        {isLoaded && (
-          <div className="fixed md:relative md:z-10 inset-0 md:inset-auto w-full md:w-1/2 h-screen md:h-[80vh] -z-10 md:mt-0 md:ml-auto">
+        {/* 3D Model - Only visible on desktop */}
+        {isLoaded && !isMobile && (
+          <div className="relative md:z-10 w-1/2 h-[80vh] ml-auto hidden md:block">
             <div className="w-full h-full">
               <Suspense 
                 fallback={

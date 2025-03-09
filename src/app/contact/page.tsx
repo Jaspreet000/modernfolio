@@ -11,7 +11,6 @@ import { BsPerson, BsChatDots } from "react-icons/bs";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Float } from "@react-three/drei";
 import type { Group } from 'three';
-import emailjs from '@emailjs/browser';
 
 function PhoneModel() {
   const { scene } = useGLTF('/models/phone.glb');
@@ -179,6 +178,17 @@ export default function Contact() {
     message?: string;
   }>({});
 
+  useEffect(() => {
+    // Initialize EmailJS only on client side
+    const initEmailJs = async () => {
+      if (typeof window !== 'undefined') {
+        const emailjs = (await import('@emailjs/browser')).default;
+        emailjs.init("Kd7KVUGIFXpLEEVlb");
+      }
+    };
+    initEmailJs();
+  }, []);
+
   const validateForm = () => {
     const newErrors: typeof errors = {};
     
@@ -214,12 +224,11 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      // Initialize EmailJS (add this at the start of your component or in a useEffect)
-      emailjs.init("Kd7KVUGIFXpLEEVlb");
-
+      const emailjs = (await import('@emailjs/browser')).default;
+      
       const result = await emailjs.send(
-        'modernfolio', // Replace with your EmailJS service ID
-        'template_13v3o7f', // Replace with your EmailJS template ID
+        'modernfolio',
+        'template_13v3o7f',
         {
           from_name: formState.name,
           from_email: formState.email,
@@ -243,7 +252,6 @@ export default function Contact() {
           message: 'Thank you for your message! I will get back to you soon.'
         });
         
-        // Reset form
         setFormState({
           name: "",
           email: "",

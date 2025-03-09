@@ -10,6 +10,7 @@ import Link from "next/link";
 // import Image from "next/image";
 import dynamic from "next/dynamic";
 import type { Application } from '@splinetool/runtime';
+import * as THREE from "three";
 
 // Extended type to include timeline methods
 interface SplineTimeline {
@@ -22,26 +23,30 @@ interface ExtendedApplication extends Application {
   getEventsByType: (type: string) => any[];
 }
 
-// Dynamically import heavy components
+// Dynamically import heavy components with loading configuration
 const Scene3D = dynamic(() => import("@/components/Scene3D"), {
   ssr: false,
-  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />
+  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />,
+  suspense: true
 });
 
 const Spline = dynamic(() => import("@splinetool/react-spline"), {
   ssr: false,
-  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />
+  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />,
+  suspense: true
 });
 
 // Dynamically import Three.js components
 const ThreeBackground = dynamic(() => import("@/components/ThreeComponents"), {
   ssr: false,
-  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />
+  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />,
+  suspense: true
 });
 
 const ThreeScene = dynamic(() => import("@/components/ThreeScene"), {
   ssr: false,
-  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />
+  loading: () => <div className="w-full h-full bg-primary/50 animate-pulse" />,
+  suspense: true
 });
 
 // Stats data
@@ -133,23 +138,44 @@ function MovingStars({ isMobile }: MovingStarsProps) {
 }
 
 function HeroModel() {
-  const { scene } = useGLTF('/models/abstract1.glb');
+  const { scene } = useGLTF('/models/abstract1.glb', true); // Enable DRACO compression
   
   useEffect(() => {
+    // Optimize materials and meshes
     scene.traverse((child: any) => {
       if (child.isMesh) {
-        // Adjusted materials for better visibility
+        // Optimize material settings
         child.material.envMapIntensity = 1.5;
         child.material.needsUpdate = true;
         child.material.shadowSide = 2;
         child.material.metalness = 0.6;
         child.material.roughness = 0.2;
         child.material.emissiveIntensity = 0.4;
+        
+        // Enable frustum culling
+        child.frustumCulled = true;
+        
+        // Optimize geometry if possible
+        if (child.geometry) {
+          child.geometry.computeBoundingSphere();
+          child.geometry.computeBoundingBox();
+        }
+        
+        // Only enable shadows where needed
         child.castShadow = true;
         child.receiveShadow = true;
-        child.frustumCulled = true;
       }
     });
+    
+    // Clean up
+    return () => {
+      scene.traverse((child: any) => {
+        if (child.isMesh) {
+          child.geometry?.dispose();
+          child.material?.dispose();
+        }
+      });
+    };
   }, [scene]);
 
   return (
@@ -305,31 +331,57 @@ export default function Home() {
                 <Canvas
                   camera={{ position: [0, 0, 25], fov: 35, far: 1000 }}
                   style={{ background: 'transparent' }}
-                  dpr={[1, 2]}
+                  dpr={[1, Math.min(2, window.devicePixelRatio)]}
                   performance={{ min: 0.5 }}
-                  shadows
-                  onCreated={({ gl }) => {
+                  shadows={{
+                    enabled: true,
+                    type: THREE.PCFSoftShadowMap,
+                    autoUpdate: false,
+                    needsUpdate: true
+                  }}
+                  gl={{
+                    antialias: !isMobile,
+                    alpha: true,
+                    stencil: false,
+                    depth: true,
+                    powerPreference: 'high-performance',
+                    logarithmicDepthBuffer: true
+                  }}
+                  onCreated={({ gl, scene }) => {
                     setIsModelLoaded(true);
                     gl.shadowMap.enabled = true;
-                    gl.shadowMap.type = 2;
+                    gl.shadowMap.type = THREE.PCFSoftShadowMap;
+                    
+                    // Optimize scene
+                    scene.matrixAutoUpdate = false;
+                    // Handle scene updates manually
+                    scene.traverse((obj) => {
+                      obj.matrixAutoUpdate = false;
+                      obj.updateMatrix();
+                    });
                   }}
                 >
-                  {/* Base lighting */}
+                  {/* Base lighting - optimized */}
                   <ambientLight intensity={0.6} color="#ffffff" />
                   <directionalLight 
                     position={[5, 5, 5]} 
                     intensity={1.2}
                     castShadow
+                    shadow-mapSize-width={1024}
+                    shadow-mapSize-height={1024}
+                    shadow-camera-far={50}
+                    shadow-camera-near={1}
                     color="#ffffff"
                   />
                   
-                  {/* Accent lighting for vibrant colors */}
+                  {/* Accent lighting - optimized */}
                   <pointLight
                     position={[-5, 5, 2]}
                     intensity={0.8}
                     color="#ff3366"
                     distance={30}
                     decay={1.5}
+                    castShadow={false}
                   />
                   <pointLight
                     position={[5, -5, 2]}
@@ -596,35 +648,23 @@ export default function Home() {
 
       <Suspense fallback={null}>
         {/* Contact CTA */}
-        <Section className="py-16 relative overflow-hidden">
-          {/* Static background with gradient */}
-          <div className="absolute inset-0">
-            {/* <div className="absolute inset-0 bg-[#0a0014]">
-              <div className="absolute inset-0 bg-gradient-to-r from-accent-purple/10 to-accent-pink/10" />
-              <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
-            </div> */}
-          </div>
-
+        <Section className="py-12 sm:py-16 relative overflow-hidden">
           {/* Content Container */}
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="relative glassmorphism border border-white/10 p-6 sm:p-8 md:p-12 lg:p-16 rounded-3xl overflow-hidden">
-              {/* Static gradient accents */}
-              {/* <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-accent-purple/10 blur-3xl" />
-              <div className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full bg-accent-pink/10 blur-3xl" /> */}
-              
+            <div className="relative glassmorphism border border-white/10 p-4 sm:p-8 md:p-12 lg:p-16 rounded-2xl sm:rounded-3xl overflow-hidden">
               {/* Content */}
               <div className="relative z-10">
-                <div className="space-y-6 sm:space-y-8 md:space-y-10 text-center">
+                <div className="space-y-4 sm:space-y-6 md:space-y-8 text-center">
                   {/* Static decorative line */}
                   <div className="flex justify-center">
-                    <div className="h-0.5 sm:h-1 w-[60px] sm:w-[80px] md:w-[100px] bg-gradient-to-r from-accent-purple to-accent-pink rounded-full" />
+                    <div className="h-0.5 sm:h-1 w-[40px] sm:w-[80px] md:w-[100px] bg-gradient-to-r from-accent-purple to-accent-pink rounded-full" />
                   </div>
 
                   {/* Heading */}
-                  <div className="space-y-3 sm:space-y-4">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight">
+                  <div className="space-y-2 sm:space-y-4">
+                    <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight">
                       Let's Build Your
-                      <span className="block mt-1 sm:mt-2">
+                      <span className="block mt-0.5 sm:mt-2">
                         <span className="text-accent-cyan">Digital </span>
                         <span className="text-accent-pink">Future</span>
                       </span>
@@ -636,25 +676,25 @@ export default function Home() {
                   </div>
 
                   {/* CTA Button */}
-                  <div className="pt-4 sm:pt-6">
+                  <div className="pt-3 sm:pt-6">
                     <Link href="/contact" className="inline-block w-full sm:w-auto">
-                      <button className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-medium text-white bg-gradient-to-r from-accent-purple to-accent-pink rounded-lg hover:opacity-90 transition-opacity duration-300">
-                        <span className="flex items-center justify-center gap-2">
+                      <button className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg font-medium text-white bg-gradient-to-r from-accent-purple to-accent-pink rounded-lg hover:opacity-90 transition-opacity duration-300">
+                        <span className="flex items-center justify-center gap-1.5 sm:gap-2">
                           Start Your Project
-                          <span className="text-xl">→</span>
+                          <span className="text-lg sm:text-xl">→</span>
                         </span>
                       </button>
                     </Link>
                   </div>
 
                   {/* Tech stack icons */}
-                  <div className="flex justify-center gap-8 pt-8">
+                  <div className="flex justify-center gap-6 sm:gap-8 pt-6 sm:pt-8">
                     {['react', 'next', 'three'].map((tech) => (
                       <div
                         key={tech}
                         className="text-white/30 hover:text-white/60 transition-colors duration-300"
                       >
-                        <i className={`fab fa-${tech} text-2xl sm:text-3xl`} />
+                        <i className={`fab fa-${tech} text-xl sm:text-2xl md:text-3xl`} />
                       </div>
                     ))}
                   </div>

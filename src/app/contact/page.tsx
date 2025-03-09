@@ -11,6 +11,7 @@ import { BsPerson, BsChatDots } from "react-icons/bs";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Float } from "@react-three/drei";
 import type { Group } from 'three';
+import emailjs from '@emailjs/browser';
 
 function PhoneModel() {
   const { scene } = useGLTF('/models/phone.glb');
@@ -62,7 +63,23 @@ const socialLinks = [
   { name: "Instagram", url: "https://www.instagram.com/__._jass_i_.__/", icon: FaInstagram, color: "#E4405F" },
 ];
 
-const InputField = ({ label, type = "text", icon: Icon, ...props }: any) => (
+const Notification = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white`}
+  >
+    <div className="flex items-center gap-2">
+      <span>{message}</span>
+      <button onClick={onClose} className="ml-2 hover:opacity-80">×</button>
+    </div>
+  </motion.div>
+);
+
+const InputField = ({ label, type = "text", icon: Icon, error, ...props }: any) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -92,25 +109,44 @@ const InputField = ({ label, type = "text", icon: Icon, ...props }: any) => (
         {type === "textarea" ? (
           <textarea
             {...props}
-            className="w-full bg-gray-800/50 backdrop-blur-sm border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-pink focus:ring-1 focus:ring-accent-pink transition-all duration-300 shadow-lg shadow-accent-pink/5 group-hover:shadow-accent-pink/10"
+            className={`w-full bg-gray-800/50 backdrop-blur-sm border-2 ${
+              error ? 'border-red-500' : 'border-gray-700'
+            } rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-pink focus:ring-1 focus:ring-accent-pink transition-all duration-300 shadow-lg shadow-accent-pink/5 group-hover:shadow-accent-pink/10`}
             rows={5}
           />
         ) : (
           <input
             type={type}
             {...props}
-            className="w-full bg-gray-800/50 backdrop-blur-sm border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-pink focus:ring-1 focus:ring-accent-pink transition-all duration-300 shadow-lg shadow-accent-pink/5 group-hover:shadow-accent-pink/10"
+            className={`w-full bg-gray-800/50 backdrop-blur-sm border-2 ${
+              error ? 'border-red-500' : 'border-gray-700'
+            } rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-pink focus:ring-1 focus:ring-accent-pink transition-all duration-300 shadow-lg shadow-accent-pink/5 group-hover:shadow-accent-pink/10`}
           />
         )}
       </div>
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-500 text-sm mt-1"
+        >
+          {error}
+        </motion.p>
+      )}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="absolute inset-0 border-2 border-accent-pink/0 rounded-xl"
+          className={`absolute inset-0 border-2 border-accent-pink/0 rounded-xl ${
+            error ? 'border-red-500/10' : ''
+          }`}
           initial={false}
-          whileHover={{ scale: 1.02, borderColor: "rgba(236, 72, 153, 0.1)" }}
+          whileHover={{ scale: 1.02, borderColor: error ? "rgba(239, 68, 68, 0.2)" : "rgba(236, 72, 153, 0.1)" }}
         />
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-accent-pink/10 to-accent-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
+          className={`absolute inset-0 bg-gradient-to-r ${
+            error 
+              ? 'from-red-500/10 to-red-400/10'
+              : 'from-accent-pink/10 to-accent-purple/10'
+          } opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl`}
           initial={false}
           whileHover={{ scale: 1.05 }}
         />
@@ -136,14 +172,96 @@ export default function Contact() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    message?: string;
+  }>({});
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+    
+    if (!formState.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    
+    if (!formState.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formState.email)) {
+      newErrors.email = "Invalid email address";
+    }
+    
+    if (!formState.message.trim()) {
+      newErrors.message = "Message is required";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      setNotification({
+        type: 'error',
+        message: 'Please fill in all required fields correctly.'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log(formState);
-    setIsSubmitting(false);
+
+    try {
+      // Initialize EmailJS (add this at the start of your component or in a useEffect)
+      emailjs.init("Kd7KVUGIFXpLEEVlb");
+
+      const result = await emailjs.send(
+        'modernfolio', // Replace with your EmailJS service ID
+        'template_13v3o7f', // Replace with your EmailJS template ID
+        {
+          from_name: formState.name,
+          from_email: formState.email,
+          message: formState.message,
+          to_name: 'Jaspreet',
+          sent_at: new Date().toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZoneName: 'short'
+          })
+        }
+      );
+
+      if (result.status === 200) {
+        setNotification({
+          type: 'success',
+          message: 'Thank you for your message! I will get back to you soon.'
+        });
+        
+        // Reset form
+        setFormState({
+          name: "",
+          email: "",
+          message: "",
+        });
+      } else {
+        throw new Error('Failed to send message');
+      }
+      
+    } catch (error) {
+      console.error('Email sending error:', error);
+      setNotification({
+        type: 'error',
+        message: 'Failed to send message. Please try again later or contact me directly via email.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -152,6 +270,16 @@ export default function Contact() {
         <ParticleBackground />
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-repeat opacity-5 pointer-events-none" />
         
+        <AnimatePresence>
+          {notification && (
+            <Notification
+              message={notification.message}
+              type={notification.type}
+              onClose={() => setNotification(null)}
+            />
+          )}
+        </AnimatePresence>
+
         <Section className="min-h-screen" isFirstSection={true}>
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <motion.div
@@ -187,9 +315,12 @@ export default function Contact() {
                   value={formState.name}
                   icon={BsPerson}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    console.log('Name input changed:', e.target.value);
                     setFormState({ ...formState, name: e.target.value });
+                    if (errors.name) {
+                      setErrors({ ...errors, name: undefined });
+                    }
                   }}
+                  error={errors.name}
                 />
                 <InputField
                   label="Email"
@@ -197,9 +328,12 @@ export default function Contact() {
                   icon={HiOutlineMail}
                   value={formState.email}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    console.log('Email input changed:', e.target.value);
                     setFormState({ ...formState, email: e.target.value });
+                    if (errors.email) {
+                      setErrors({ ...errors, email: undefined });
+                    }
                   }}
+                  error={errors.email}
                 />
                 <InputField
                   label="Message"
@@ -207,32 +341,39 @@ export default function Contact() {
                   icon={BsChatDots}
                   value={formState.message}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    console.log('Message input changed:', e.target.value);
                     setFormState({ ...formState, message: e.target.value });
+                    if (errors.message) {
+                      setErrors({ ...errors, message: undefined });
+                    }
                   }}
+                  error={errors.message}
                 />
                 <motion.div
                   whileHover={{ scale: 1.05, boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)" }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <MagneticButton
-                    className="w-full bg-gradient-to-r from-[#FF2E93] to-[#FF8AAD] text-white py-4 rounded-xl font-semibold relative overflow-hidden group"
-                  >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {isSubmitting ? (
-                        <>
-                          <motion.div
-                            className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          />
-                          Sending...
-                        </>
-                      ) : (
-                        "Send Message"
-                      )}
-                    </span>
-                  </MagneticButton>
+                  <button type="submit" disabled={isSubmitting}>
+                    <MagneticButton
+                      className={`w-full bg-gradient-to-r from-[#FF2E93] to-[#FF8AAD] text-white py-4 rounded-xl font-semibold relative overflow-hidden group ${
+                        isSubmitting ? 'opacity-80 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {isSubmitting ? (
+                          <>
+                            <motion.div
+                              className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                            Sending...
+                          </>
+                        ) : (
+                          "Send Message"
+                        )}
+                      </span>
+                    </MagneticButton>
+                  </button>
                 </motion.div>
               </form>
 

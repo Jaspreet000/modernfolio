@@ -242,8 +242,8 @@ export default function Home() {
     <div ref={containerRef} className="relative">
       {/* Hero Section */}
       <motion.div
-        style={{ y, opacity }}
-        className="relative min-h-screen flex flex-col md:flex-row items-start justify-between px-5 md:px-12 pt-28 md:pt-24 pb-12"
+        style={{ y: useTransform(scrollYProgress, [0, 1], ["0%", "50%"]), opacity: useTransform(scrollYProgress, [0, 0.5], [1, 0]) }}
+        className="relative min-h-screen w-full flex flex-col md:flex-row items-center justify-between px-5 md:px-12 py-12 md:py-0 pt-24 md:pt-28"
       >
         {/* Stars Background - Optimized for all devices */}
         <div className="fixed inset-0 -z-20 bg-[#0a0014]">
@@ -269,7 +269,7 @@ export default function Home() {
         </div>
 
         {/* Hero Content - Left Side */}
-        <div className="relative z-10 w-full md:w-1/2 max-w-[540px] mt-0">
+        <div className="relative z-10 w-full md:w-1/2 max-w-[540px] flex flex-col justify-center md:min-h-[calc(100vh-112px)]">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -318,8 +318,8 @@ export default function Home() {
         </div>
 
         {/* 3D Model - Only visible on desktop */}
-        {isLoaded && !isMobile && (
-          <div className="relative md:z-10 w-1/2 h-[80vh] ml-auto hidden md:block">
+        {!isMobile && (
+          <div className="relative md:z-10 w-full md:w-1/2 h-[70vh] md:h-[calc(100vh-112px)]">
             <div className="w-full h-full">
               <Suspense 
                 fallback={
@@ -462,13 +462,13 @@ export default function Home() {
       {/* Remaining sections wrapped in Suspense for progressive loading */}
       <Suspense fallback={null}>
         {/* Stats Section */}
-        <Section className="py-12 sm:py-16 relative overflow-hidden">
+        <section className="py-12 sm:py-16 relative overflow-hidden">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-[#0a0014]/90 top-[-100px] bottom-[-100px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent top-[-100px]" />
+          <div className="absolute inset-0 bg-[#0a0014]/90 w-screen" />
+          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent"/>
           
           {/* Content */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="w-full mx-auto px-4 sm:px-6 relative z-10">
             {/* Section Title */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -524,12 +524,12 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </Section>
+        </section>
       </Suspense>
 
       <Suspense fallback={null}>
         {/* Featured Projects */}
-        <Section className="py-12 sm:py-16 relative overflow-hidden">
+        <section className="py-12 sm:py-16 relative overflow-hidden">
           {/* Simple gradient background */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0014] to-[#1a0a2a] top-[-100px] bottom-[-100px]" />
           
@@ -614,7 +614,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-        </Section>
+        </section>
       </Suspense>
 
       <Suspense fallback={null}>
@@ -707,7 +707,7 @@ export default function Home() {
 
       <Suspense fallback={null}>
         {/* Testimonials Section */}
-        <Section className="py-12 sm:py-16 relative overflow-hidden">
+        <section className="py-12 sm:py-16 relative overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 top-[-100px] bg-gradient-to-r from-[#0a0014] to-[#1a0a2a] animate-pulse opacity-90 bottom-[-100px] mb-4" />
 
@@ -787,7 +787,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </Section>
+        </section>
       </Suspense>
     </div>
   );

@@ -412,7 +412,7 @@ export default function About() {
         </Section>
 
         {/* Skills Section */}
-        <Section className="py-4 sm:py-12">
+        <section className="p-4 sm:p-12 relative overflow-hidden">
           <GridBackground />
           <div className="relative z-10 max-w-7xl mx-auto">
             <motion.div
@@ -459,10 +459,10 @@ export default function About() {
               ))}
             </div>
           </div>
-        </Section>
+        </section>
 
         {/* Experience Section */}
-        <Section className="py-8 sm:py-12">
+        <section className="p-8 sm:p-12">
           <div className="relative z-10 max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -535,7 +535,7 @@ export default function About() {
               </div>
             </div>
           </div>
-        </Section>
+        </section>
       </main>
     </PageTransition>
   );

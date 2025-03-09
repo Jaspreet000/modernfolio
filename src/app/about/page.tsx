@@ -378,7 +378,35 @@ export default function About() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
             >
-              <Image src="/images/me.jpg" alt="My Image" layout="fill" objectFit="cover" className="rounded-lg" />
+              {/* Decorative background elements */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-accent-purple/30 via-accent-pink/30 to-accent-cyan/30 blur-2xl rounded-lg opacity-70 group-hover:opacity-75 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-accent-purple/10 to-accent-pink/10 rounded-lg" />
+              
+              {/* Main image container */}
+              <div className="relative h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl">
+                {/* Gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-[2]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-accent-purple/20 via-transparent to-accent-pink/20 mix-blend-overlay z-[2]" />
+                
+                {/* Image */}
+                <Image 
+                  src="/images/me.jpg" 
+                  alt="Jaspreet Singh - Full Stack Developer" 
+                  layout="fill" 
+                  objectFit="cover"
+                  className="z-[1] transition-transform duration-500 hover:scale-105"
+                  priority
+                />
+
+                {/* Decorative corner accents */}
+                <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-accent-purple/50 rounded-tl-lg z-[3]" />
+                <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-accent-pink/50 rounded-br-lg z-[3]" />
+                
+                {/* Subtle glow effect */}
+                <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 z-[2]">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-accent-purple/20 via-transparent to-accent-pink/20" />
+                </div>
+              </div>
             </motion.div>
           </div>
         </Section>

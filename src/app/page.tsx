@@ -112,55 +112,58 @@ function MovingStars({ isMobile }: MovingStarsProps) {
   const starsRef = useRef<any>(null);
 
   useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    starsRef.current.rotation.y = time * (isMobile ? 0.02 : 0.05);
+    // Reduce rotation speed and use requestAnimationFrame for smoother animation
+    if (starsRef.current) {
+      const time = clock.getElapsedTime();
+      starsRef.current.rotation.y = time * (isMobile ? 0.01 : 0.02);
+    }
   });
 
   return (
     <Stars 
-      radius={isMobile ? 50 : 80} 
-      depth={isMobile ? 30 : 40} 
-      count={isMobile ? 1500 : 2500}
-      factor={isMobile ? 2 : 3} 
+      radius={isMobile ? 40 : 60} 
+      depth={isMobile ? 20 : 30} 
+      count={isMobile ? 1000 : 1500}
+      factor={isMobile ? 2 : 2.5} 
       saturation={0} 
       fade 
-      ref={starsRef} 
+      ref={starsRef}
     />
   );
 }
 
 function HeroModel() {
-  const { scene } = useGLTF('/models/abstract.glb');
+  const { scene } = useGLTF('/models/abstract1.glb');
   
   useEffect(() => {
     scene.traverse((child: any) => {
       if (child.isMesh) {
-        // Simplified materials for better performance
-        child.material.metalness = 0.8;
+        // Adjusted materials for better visibility
+        child.material.envMapIntensity = 1.5;
+        child.material.needsUpdate = true;
+        child.material.shadowSide = 2;
+        child.material.metalness = 0.6;
         child.material.roughness = 0.2;
-        child.material.color.setHex(0x4A1F3D);
-        child.material.emissive.setHex(0x5A2F4D);
-        child.material.emissiveIntensity = 0.5;
-        // Remove expensive effects
-        child.material.envMapIntensity = 1.0;
-        child.material.clearcoat = 0;
-        child.material.clearcoatRoughness = 0;
+        child.material.emissiveIntensity = 0.4;
+        child.castShadow = true;
+        child.receiveShadow = true;
+        child.frustumCulled = true;
       }
     });
   }, [scene]);
 
   return (
     <Float
-      speed={0.5}
-      rotationIntensity={0.2}
-      floatIntensity={0.2}
-      floatingRange={[-0.05, 0.05]}
+      speed={0.8}
+      rotationIntensity={0.4}
+      floatIntensity={0.3}
+      floatingRange={[-0.1, 0.1]}
     >
       <primitive
         object={scene}
-        position={[0, -0.5, -35]}
-        scale={-12}
-        rotation={[Math.PI / 4, 0, 0]}
+        position={[0, 0, 0]}
+        scale={8}
+        rotation={[0, Math.PI / 4, 0]}
       />
     </Float>
   );
@@ -170,6 +173,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
@@ -186,16 +190,25 @@ export default function Home() {
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
+    
+    // Debounce resize event for better performance
+    let timeoutId: NodeJS.Timeout;
+    const debouncedResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleResize, 250);
+    };
 
-    // Delay loading for better initial page load
+    window.addEventListener("resize", debouncedResize);
+
+    // Stagger loading of heavy components
     const timer = setTimeout(() => {
       setIsLoaded(true);
-    }, 1000);
+    }, 800);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouncedResize);
       clearTimeout(timer);
+      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -204,73 +217,40 @@ export default function Home() {
       {/* Hero Section */}
       <motion.div
         style={{ y, opacity }}
-        className="relative min-h-screen flex flex-col items-start md:items-center justify-center px-5 md:px-4 pt-20 md:pt-24 pb-12"
+        className="relative min-h-screen flex flex-col md:flex-row items-start justify-between px-5 md:px-12 pt-28 md:pt-24 pb-12"
       >
-        {/* Stars Background - Now works on all devices */}
+        {/* Stars Background - Optimized for all devices */}
         <div className="fixed inset-0 -z-20 bg-[#0a0014]">
           <Suspense fallback={null}>
             <Canvas 
-              camera={{ position: [0, 0, 1] }}
+              camera={{ position: [0, 0, 1], far: 100 }}
               dpr={isMobile ? [1, 1.5] : [1, 2]}
-              performance={{ min: isMobile ? 0.3 : 0.5 }}
+              performance={{ min: 0.5 }}
               gl={{
                 powerPreference: "high-performance",
                 antialias: !isMobile,
-                alpha: true
+                alpha: true,
+                stencil: false,
+                depth: true,
+                logarithmicDepthBuffer: true
               }}
             >
               <MovingStars isMobile={isMobile} />
-              <fog attach="fog" args={['#0a0014', 1.5, 6]} />
+              <fog attach="fog" args={['#0a0014', 2, 5]} />
             </Canvas>
           </Suspense>
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0014]/50 via-transparent to-[#0a0014]/80" />
         </div>
 
-        {/* 3D Model - Only for desktop */}
-        {isLoaded && !isMobile && (
-          <div className="absolute inset-0 -z-10">
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="relative w-full h-full transform-gpu">
-                <div className="absolute inset-0 flex items-center justify-center -mt-16">
-                  <Suspense fallback={<div className="w-full h-full bg-primary/50 animate-pulse" />}>
-                    <Canvas
-                      camera={{ position: [0, 0, 15], fov: 25 }}
-                      style={{ background: 'transparent' }}
-                      dpr={[1, 2]}
-                      performance={{ min: 0.5 }}
-                    >
-                      <ambientLight intensity={0.5} color="#4A1F3D" />
-                      <directionalLight 
-                        position={[5, 5, 5]} 
-                        intensity={1.2}
-                        color="#5A2F4D"
-                      />
-                      <HeroModel />
-                      <OrbitControls
-                        enableZoom={false}
-                        enablePan={false}
-                        minPolarAngle={Math.PI / 2.2}
-                        maxPolarAngle={Math.PI / 1.9}
-                        autoRotate
-                        autoRotateSpeed={0.5}
-                      />
-                    </Canvas>
-                  </Suspense>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Hero Content */}
-        <div className="relative z-10 md:text-center w-full max-w-[540px] md:max-w-none px-0 md:px-6 mt-0 md:mt-[-10vh]">
+        {/* Hero Content - Left Side */}
+        <div className="relative z-10 w-full md:w-1/2 max-w-[540px] mt-0">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-8 md:mb-6 flex flex-col md:block"
+            className="mb-8 md:mb-6"
           >
-            <div className="w-full text-left md:text-center">
+            <div className="w-full text-left">
               <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple via-accent-pink to-accent-cyan">
                 Hi there! I&apos;m
               </h1>
@@ -280,7 +260,7 @@ export default function Home() {
               <h2 className="text-xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-4 text-white">
                 Full Stack Developer
               </h2>
-              <p className="text-base md:text-xl text-white/80 max-w-[100%] md:max-w-2xl md:mx-auto leading-relaxed mb-8 md:mb-0">
+              <p className="text-base md:text-xl text-white/80 max-w-[100%] leading-relaxed mb-8 md:mb-8">
                 with expertise in building scalable web applications, AI-powered platforms, and secure authentication systems using Next.js, React.js, and cloud technologies.
               </p>
             </div>
@@ -290,7 +270,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="flex flex-col md:flex-row gap-3 md:gap-6 justify-start md:justify-center items-stretch md:items-center"
+            className="flex flex-col md:flex-row gap-3 md:gap-6 items-stretch md:items-center"
           >
             <Link href="/projects" className="w-full md:w-auto">
               <MagneticButton 
@@ -310,6 +290,97 @@ export default function Home() {
             </Link>
           </motion.div>
         </div>
+
+        {/* 3D Model - Background on mobile, Right side on desktop */}
+        {isLoaded && (
+          <div className="fixed md:relative md:z-10 inset-0 md:inset-auto w-full md:w-1/2 h-screen md:h-[80vh] -z-10 md:mt-0 md:ml-auto">
+            <div className="w-full h-full">
+              <Suspense 
+                fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-32 h-32 rounded-full bg-primary/20 animate-pulse" />
+                  </div>
+                }
+              >
+                <Canvas
+                  camera={{ position: [0, 0, 25], fov: 35, far: 1000 }}
+                  style={{ background: 'transparent' }}
+                  dpr={[1, 2]}
+                  performance={{ min: 0.5 }}
+                  shadows
+                  onCreated={({ gl }) => {
+                    setIsModelLoaded(true);
+                    gl.shadowMap.enabled = true;
+                    gl.shadowMap.type = 2;
+                  }}
+                >
+                  {/* Base lighting */}
+                  <ambientLight intensity={0.6} color="#ffffff" />
+                  <directionalLight 
+                    position={[5, 5, 5]} 
+                    intensity={1.2}
+                    castShadow
+                    color="#ffffff"
+                  />
+                  
+                  {/* Accent lighting for vibrant colors */}
+                  <pointLight
+                    position={[-5, 5, 2]}
+                    intensity={0.8}
+                    color="#ff3366"
+                    distance={30}
+                    decay={1.5}
+                  />
+                  <pointLight
+                    position={[5, -5, 2]}
+                    intensity={0.8}
+                    color="#00ffff"
+                    distance={30}
+                    decay={1.5}
+                  />
+                  <spotLight
+                    position={[0, 8, 4]}
+                    intensity={0.6}
+                    color="#9945ff"
+                    angle={0.3}
+                    penumbra={0.8}
+                    decay={1.5}
+                  />
+                  <spotLight
+                    position={[0, -8, 4]}
+                    intensity={0.6}
+                    color="#00ff9d"
+                    angle={0.3}
+                    penumbra={0.8}
+                    decay={1.5}
+                  />
+                  <pointLight
+                    position={[0, 0, -10]}
+                    intensity={0.5}
+                    color="#ffffff"
+                    distance={20}
+                    decay={2}
+                  />
+                  {isModelLoaded && <HeroModel />}
+                  <OrbitControls
+                    enableZoom={false}
+                    enablePan={false}
+                    enableRotate={true}
+                    maxPolarAngle={Math.PI}
+                    minPolarAngle={0}
+                    autoRotate
+                    autoRotateSpeed={0.3}
+                    enableDamping
+                    dampingFactor={0.05}
+                  />
+                </Canvas>
+              </Suspense>
+            </div>
+          </div>
+        )}
+
+        {/* Dark overlay for better text readability on mobile */}
+        <div className="fixed inset-0 bg-gradient-to-r from-[#0a0014]/80 to-transparent md:hidden -z-10" />
 
         {/* Scroll Indicator - Only show on desktop */}
         {!isMobile && (
@@ -526,43 +597,31 @@ export default function Home() {
       <Suspense fallback={null}>
         {/* Contact CTA */}
         <Section className="py-16 relative overflow-hidden">
-          {/* Animated background */}
-          {/* <div className="absolute inset-0">
-            <Suspense fallback={null}>
-              <ThreeBackground />
-            </Suspense>
-          </div> */}
+          {/* Static background with gradient */}
+          <div className="absolute inset-0">
+            {/* <div className="absolute inset-0 bg-[#0a0014]">
+              <div className="absolute inset-0 bg-gradient-to-r from-accent-purple/10 to-accent-pink/10" />
+              <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
+            </div> */}
+          </div>
 
           {/* Content Container */}
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="relative glassmorphism border border-white/10 p-6 sm:p-8 md:p-12 lg:p-16 rounded-3xl overflow-hidden">
-              {/* Animated gradient orbs */}
-              {/* <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-accent-purple/20 blur-3xl animate-pulse" />
-              <div className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full bg-accent-pink/20 blur-3xl animate-pulse delay-300" /> */}
+              {/* Static gradient accents */}
+              {/* <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-accent-purple/10 blur-3xl" />
+              <div className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full bg-accent-pink/10 blur-3xl" /> */}
               
               {/* Content */}
               <div className="relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  className="space-y-6 sm:space-y-8 md:space-y-10 text-center"
-                >
-                  {/* Decorative line */}
+                <div className="space-y-6 sm:space-y-8 md:space-y-10 text-center">
+                  {/* Static decorative line */}
                   <div className="flex justify-center">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: "60px sm:width-[80px] md:width-[100px]" }}
-                      transition={{ duration: 1 }}
-                      className="h-0.5 sm:h-1 bg-gradient-to-r from-accent-purple to-accent-pink rounded-full"
-                    />
+                    <div className="h-0.5 sm:h-1 w-[60px] sm:w-[80px] md:w-[100px] bg-gradient-to-r from-accent-purple to-accent-pink rounded-full" />
                   </div>
 
                   {/* Heading */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    className="space-y-3 sm:space-y-4"
-                  >
+                  <div className="space-y-3 sm:space-y-4">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight">
                       Let's Build Your
                       <span className="block mt-1 sm:mt-2">
@@ -574,55 +633,32 @@ export default function Home() {
                       Transform your vision into reality with cutting-edge technology 
                       and innovative design solutions.
                     </p>
-                  </motion.div>
+                  </div>
 
                   {/* CTA Button */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="pt-4 sm:pt-6"
-                  >
-                    <Link href="/contact" className="w-full sm:w-auto">
-                      <MagneticButton variant="filled" className="group relative w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg">
-                        <motion.span
-                          className="absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-pink rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                          initial={false}
-                        />
-                        <span className="flex items-center justify-center gap-2 sm:gap-3">
-                          <span>Start Your Project</span>
-                          <motion.span
-                            animate={{ x: [0, 5, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="text-lg sm:text-xl"
-                          >
-                            →
-                          </motion.span>
+                  <div className="pt-4 sm:pt-6">
+                    <Link href="/contact" className="inline-block w-full sm:w-auto">
+                      <button className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-medium text-white bg-gradient-to-r from-accent-purple to-accent-pink rounded-lg hover:opacity-90 transition-opacity duration-300">
+                        <span className="flex items-center justify-center gap-2">
+                          Start Your Project
+                          <span className="text-xl">→</span>
                         </span>
-                      </MagneticButton>
+                      </button>
                     </Link>
-                  </motion.div>
+                  </div>
 
-                  {/* Tech stack icons or additional decorative elements can be added here */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex justify-center gap-8 pt-8"
-                  >
-                    {['react', 'next', 'three'].map((tech, index) => (
-                      <motion.div
+                  {/* Tech stack icons */}
+                  <div className="flex justify-center gap-8 pt-8">
+                    {['react', 'next', 'three'].map((tech) => (
+                      <div
                         key={tech}
-                        initial={{ y: 20, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="text-white/30 hover:text-white/60 transition-colors duration-300 text-3xl"
+                        className="text-white/30 hover:text-white/60 transition-colors duration-300"
                       >
-                        <i className={`fab fa-${tech} text-3xl`}></i>
-                      </motion.div>
+                        <i className={`fab fa-${tech} text-2xl sm:text-3xl`} />
+                      </div>
                     ))}
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
